@@ -1,9 +1,15 @@
-import React from 'react'
 
-const Page = () => {
+import Header from '@/components/Header'
+import Cards from '@/components/Cards';
+
+const page = () => {
   return (
-    <div>Dashboard</div>
+    <div>
+      <Header />
+      <Cards />
+
+    </div>
   )
 }
 
-export default Page
+export default page
