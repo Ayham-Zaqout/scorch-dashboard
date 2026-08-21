@@ -1348,6 +1348,14 @@
   color: #159869;
   background: var(--green-soft);
 }
+.status-delivering {
+  color: #3479d7;
+  background: var(--blue-soft);
+}
+.status-cancelled {
+  color: var(--red);
+  background: var(--red-soft);
+}
 
 /* ============ DONUT ============ */
 .donut-visual {

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState } from "react";
 import { Sidebar } from "./SideBar";
 import { TopBar } from "./TopBar";
 
@@ -9,7 +9,7 @@ export function MainLayout({ children }) {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-ink-50 flex flex-col text-ink-900 font-sans antialiased">
+    <div className="flex min-h-screen flex-col bg-ink-50 font-sans text-ink-900 antialiased">
       <Sidebar
         collapsed={collapsed}
         onToggleCollapse={() => setCollapsed((prev) => !prev)}
@@ -18,11 +18,13 @@ export function MainLayout({ children }) {
       />
 
       <div
-        className={`flex-1 flex flex-col min-w-0 transition-all duration-300 ${collapsed ? "lg:pl-18" : "lg:pl-65"
-          }`}>
+        className={`flex min-w-0 flex-1 flex-col transition-all duration-300 ${
+          collapsed ? "lg:pl-18" : "lg:pl-65"
+        }`}
+      >
         <TopBar onOpenMobileSidebar={() => setMobileOpen(true)} />
 
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto animate-fade-in">
+        <main className="mx-auto w-full max-w-7xl flex-1 animate-fade-in p-4 sm:p-6 lg:p-8">
           {children}
         </main>
       </div>

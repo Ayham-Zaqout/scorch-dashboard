@@ -1,9 +1,3 @@
-import React from 'react'
-
-const Menu = () => {
-  return (
-    <div>Menu</div>
-  )
+export default function MenuPage() {
+  return <div>Menu</div>;
 }
-
-export default Menu

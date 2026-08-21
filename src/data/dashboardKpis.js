@@ -50,21 +50,4 @@ export const dashboardKpis = {
   },
 };
 
-export const kpiCards = [
-  {
-    id: "revenue",
-    type: "revenue",
-  },
-  {
-    id: "activeOrders",
-    type: "activeOrders",
-  },
-  {
-    id: "kitchen",
-    type: "kitchen",
-  },
-  {
-    id: "lowStock",
-    type: "lowStock",
-  },
-];
+export const kpiCards = ["revenue", "activeOrders", "kitchen", "lowStock"];

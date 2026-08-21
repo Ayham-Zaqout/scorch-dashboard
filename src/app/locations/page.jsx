@@ -1,9 +1,3 @@
-import React from 'react'
-
-const Locations = () => {
-  return (
-    <div>Locations</div>
-  )
+export default function LocationsPage() {
+  return <div>Locations</div>;
 }
-
-export default Locations

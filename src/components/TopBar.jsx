@@ -12,7 +12,7 @@ import {
   MapPin,
   Check,
 } from "lucide-react";
-import { notifications as initialNotifications } from "../data/notifications ";
+import { notifications } from "@/data/notifications";
 
 const NOTIFICATION_ICONS = {
   order: <ShoppingBag className="h-4 w-4 text-info-500" />,
@@ -91,18 +91,18 @@ export function TopBar({ onOpenMobileSidebar = () => { } }) {
               </div>
 
               <div className="max-h-80 overflow-y-auto">
-                {initialNotifications.map((n) => (
+                {notifications.map((notification) => (
                   <div
-                    key={n.id}
+                    key={notification.id}
                     className="flex items-start gap-3 border-b border-ink-50 px-4 py-3 last:border-b-0"
                   >
                     <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-ink-50">
-                      {NOTIFICATION_ICONS[n.type]}
+                      {NOTIFICATION_ICONS[notification.type]}
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="text-sm font-medium text-ink-900">{n.title}</p>
-                      <p className="mt-0.5 text-xs leading-5 text-ink-500">{n.message}</p>
-                      <p className="mt-1 text-[11px] text-ink-400">{n.time}</p>
+                      <p className="text-sm font-medium text-ink-900">{notification.title}</p>
+                      <p className="mt-0.5 text-xs leading-5 text-ink-500">{notification.message}</p>
+                      <p className="mt-1 text-[11px] text-ink-400">{notification.time}</p>
                     </div>
                   </div>
                 ))}
