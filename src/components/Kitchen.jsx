@@ -1,253 +1,153 @@
-import { Utensils, Bike } from 'lucide-react';
+﻿"use client";
 
-const kitchenQueue = [
-    {
-        id: '#1042',
-        detail: '2x Burger, 1x Fries',
-        time: '6m',
-        delayed: false,
-    },
-    {
-        id: '#1045',
-        detail: '1x Pizza, 2x Coke',
-        time: '8m',
-        delayed: false,
-    },
-    {
-        id: '#1048',
-        detail: '3x Burger, 1x Fries',
-        time: '12m',
-        delayed: true,
-    },
-    {
-        id: '#1051',
-        detail: '2x Pizza',
-        time: '4m',
-        delayed: false,
-    },
-];
-
-const deliveryQueue = [
-    {
-        id: '#1038',
-        detail: 'Downtown',
-        time: '12m',
-        delayed: false,
-    },
-    {
-        id: '#1041',
-        detail: 'Al-Rimal',
-        time: '18m',
-        delayed: false,
-    },
-    {
-        id: '#1044',
-        detail: 'Beach Road',
-        time: '24m',
-        delayed: true,
-    },
-];
-
-const stockAlerts = [
-    {
-        name: 'Chicken Breast',
-        category: 'Meat',
-        qty: '2 kg',
-        severity: 'critical',
-        thumb: 'orange',
-    },
-    {
-        name: 'Mozzarella',
-        category: 'Dairy',
-        qty: '0',
-        severity: 'out',
-        thumb: 'red',
-    },
-    {
-        name: 'Burger Buns',
-        category: 'Bakery',
-        qty: '8',
-        severity: 'critical',
-        thumb: 'amber',
-    },
-    {
-        name: 'Tomatoes',
-        category: 'Vegetables',
-        qty: '12',
-        severity: 'normal',
-        thumb: 'green',
-    },
-];
-
-const thumbColors = {
-    orange: '#bf6b38',
-    blue: '#3981f7',
-    green: '#19b985',
-    amber: '#f0a826',
-    red: '#ef5d54',
-};
+import { useEffect, useState } from "react";
+import { Utensils, Bike, Package } from "lucide-react";
+import { getOrders, getProducts } from "@/data/mockDataStore";
 
 export default function Kitchen() {
-    return (
-        <div className="grid-3">
+  const [orders, setOrders] = useState([]);
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-            {/* Kitchen Queue */}
-            <section className="card queue-card">
+  useEffect(() => {
+    Promise.all([getOrders().catch(() => []), getProducts().catch(() => [])])
+      .then(([ordersRes, prodsRes]) => {
+        setOrders(Array.isArray(ordersRes) ? ordersRes : []);
+        setProducts(Array.isArray(prodsRes) ? prodsRes : []);
+      })
+      .finally(() => setLoading(false));
+  }, []);
 
-                <div className="card-header">
-                    <div>
-                        <h3>Kitchen Queue</h3>
-                        <p>Orders being prepared</p>
-                    </div>
+  const kitchenOrders = orders.filter(
+    (o) => o.status === "PREPARING" || o.status === "CONFIRMED" || o.status === "PENDING"
+  );
+  const deliveryOrders = orders.filter(
+    (o) => o.fulfillmentType === "DELIVERY" && o.status !== "CANCELLED"
+  );
 
-                    <span className="pill pill-info">
-                        ● 4 active
-                    </span>
-                </div>
+  const availableProducts = products.filter((p) => p.isAvailable);
 
-                <div className="queue-list">
-
-                    {kitchenQueue.map((order) => (
-                        <div
-                            className={`queue-row ${order.delayed ? 'delayed' : ''
-                                }`}
-                            key={order.id}
-                        >
-
-                            <span className="queue-icon kitchen">
-                                <Utensils size={14} />
-                            </span>
-
-                            <div>
-                                <strong>{order.id}</strong>
-                                <small>{order.detail}</small>
-                            </div>
-
-                            <b
-                                className={
-                                    order.delayed
-                                        ? 'text-danger'
-                                        : ''
-                                }
-                            >
-                                {order.time}
-                                {order.delayed && ' ⚠'}
-                            </b>
-
-                        </div>
-                    ))}
-
-                </div>
-            </section>
-
-
-            {/* Delivery & Pickup */}
-            <section className="card queue-card">
-
-                <div className="card-header">
-                    <div>
-                        <h3>Delivery & Pickup</h3>
-                        <p>Orders en route</p>
-                    </div>
-
-                    <span className="pill pill-info">
-                        ● 3 active
-                    </span>
-                </div>
-
-                <div className="queue-list">
-
-                    {deliveryQueue.map((order) => (
-                        <div
-                            className={`queue-row ${order.delayed ? 'delayed' : ''
-                                }`}
-                            key={order.id}
-                        >
-
-                            <span className="queue-icon delivery">
-                                <Bike size={14} />
-                            </span>
-
-                            <div>
-                                <strong>{order.id}</strong>
-                                <small>{order.detail}</small>
-                            </div>
-
-                            <b
-                                className={
-                                    order.delayed
-                                        ? 'text-danger'
-                                        : ''
-                                }
-                            >
-                                {order.time}
-                                {order.delayed && ' ⚠'}
-                            </b>
-
-                        </div>
-                    ))}
-
-                </div>
-            </section>
-
-
-            {/* Inventory Alerts */}
-            <section className="card queue-card">
-
-                <div className="card-header">
-                    <div>
-                        <h3>Inventory Alerts</h3>
-                        <p>Stock requiring attention</p>
-                    </div>
-
-                    <span className="pill pill-danger">
-                        ● 4 items
-                    </span>
-                </div>
-
-                <div className="queue-list">
-
-                    {stockAlerts.map((stockAlert) => (
-                        <div
-                            className="queue-row"
-                            key={stockAlert.name}
-                        >
-
-                            <span
-                                className="product-thumb"
-                                style={{
-                                    width: 28,
-                                    height: 28,
-                                    background:
-                                        thumbColors[stockAlert.thumb],
-                                }}
-                            >
-                                <Utensils size={12} />
-                            </span>
-
-                            <div>
-                                <strong>{stockAlert.name}</strong>
-                                <small>{stockAlert.category}</small>
-                            </div>
-
-                            <span
-                                className={
-                                    stockAlert.severity === 'out'
-                                        ? 'pill pill-danger'
-                                        : stockAlert.severity === 'critical'
-                                            ? 'pill pill-warning'
-                                            : 'pill pill-success'
-                                }
-                            >
-                                {stockAlert.qty}
-                            </span>
-
-                        </div>
-                    ))}
-
-                </div>
-            </section>
-
+  return (
+    <div className="mb-5 grid grid-cols-1 gap-4 lg:grid-cols-3">
+      {/* Kitchen Queue */}
+      <section className="rounded-xl border border-ink-200 bg-white p-5 shadow-xs">
+        <div className="mb-4 flex items-start justify-between gap-3 border-b border-ink-100 pb-3">
+          <div>
+            <h3 className="text-[15px] font-semibold text-ink-900">Kitchen Queue</h3>
+            <p className="mt-0.5 text-xs text-ink-400">Orders being prepared</p>
+          </div>
+          <span className="rounded-md bg-amber-50 px-2 py-1 text-xs font-semibold text-amber-700 border border-amber-200">
+            {kitchenOrders.length} active
+          </span>
         </div>
-    );
+
+        {loading ? (
+          <div className="py-6 text-center text-xs text-ink-400">Loading queue...</div>
+        ) : !kitchenOrders.length ? (
+          <div className="py-6 text-center text-xs text-ink-400">No active kitchen orders</div>
+        ) : (
+          <div className="space-y-3">
+            {kitchenOrders.slice(0, 4).map((order) => (
+              <div
+                key={order.id}
+                className="flex items-center gap-3 border-b border-ink-100 pb-3 last:border-0 last:pb-0"
+              >
+                <span className="grid h-8 w-8 place-items-center rounded-lg bg-orange-50 text-orange-600">
+                  <Utensils size={15} />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <strong className="block text-xs font-semibold text-ink-900">{order.orderNumber}</strong>
+                  <small className="mt-0.5 block text-[11px] text-ink-400">
+                    {order.customerName} ({order.fulfillmentType})
+                  </small>
+                </div>
+                <b className="text-xs font-semibold text-ink-700">{order.estimatedMinutes || 20}m</b>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
+
+      {/* Delivery Queue */}
+      <section className="rounded-xl border border-ink-200 bg-white p-5 shadow-xs">
+        <div className="mb-4 flex items-start justify-between gap-3 border-b border-ink-100 pb-3">
+          <div>
+            <h3 className="text-[15px] font-semibold text-ink-900">Delivery & Pickup</h3>
+            <p className="mt-0.5 text-xs text-ink-400">Fulfillment activity</p>
+          </div>
+          <span className="rounded-md bg-blue-50 px-2 py-1 text-xs font-semibold text-blue-700 border border-blue-200">
+            {deliveryOrders.length} orders
+          </span>
+        </div>
+
+        {loading ? (
+          <div className="py-6 text-center text-xs text-ink-400">Loading delivery queue...</div>
+        ) : !deliveryOrders.length ? (
+          <div className="py-6 text-center text-xs text-ink-400">No delivery orders</div>
+        ) : (
+          <div className="space-y-3">
+            {deliveryOrders.slice(0, 4).map((order) => (
+              <div
+                key={order.id}
+                className="flex items-center gap-3 border-b border-ink-100 pb-3 last:border-0 last:pb-0"
+              >
+                <span className="grid h-8 w-8 place-items-center rounded-lg bg-blue-50 text-blue-600">
+                  <Bike size={15} />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <strong className="block text-xs font-semibold text-ink-900">{order.orderNumber}</strong>
+                  <small className="mt-0.5 block text-[11px] text-ink-400">
+                    {order.deliveryAddressSnapshot?.address || order.location?.name || "Standard Delivery"}
+                  </small>
+                </div>
+                <b className="text-xs font-semibold text-ink-700">${Number(order.totalAmount || 0).toFixed(2)}</b>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
+
+      {/* Inventory & Products Overview */}
+      <section className="rounded-xl border border-ink-200 bg-white p-5 shadow-xs">
+        <div className="mb-4 flex items-start justify-between gap-3 border-b border-ink-100 pb-3">
+          <div>
+            <h3 className="text-[15px] font-semibold text-ink-900">Menu Availability</h3>
+            <p className="mt-0.5 text-xs text-ink-400">Active product inventory</p>
+          </div>
+          <span className="rounded-md bg-green-50 px-2 py-1 text-xs font-semibold text-green-700 border border-green-200">
+            {availableProducts.length} ready
+          </span>
+        </div>
+
+        {loading ? (
+          <div className="py-6 text-center text-xs text-ink-400">Loading products...</div>
+        ) : (
+          <div className="space-y-3">
+            {products.slice(0, 4).map((product) => (
+              <div
+                key={product.id}
+                className="flex items-center gap-3 border-b border-ink-100 pb-3 last:border-0 last:pb-0"
+              >
+                <span className="grid h-8 w-8 place-items-center rounded-lg bg-gray-100 text-gray-600">
+                  <Package size={15} />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <strong className="block text-xs font-semibold text-ink-900">{product.name}</strong>
+                  <small className="mt-0.5 block text-[11px] text-ink-400">
+                    {product.category?.name || "Category"}
+                  </small>
+                </div>
+                <span
+                  className={`rounded px-2 py-0.5 text-[11px] font-medium ${product.isAvailable ? "bg-green-50 text-green-700" : "bg-red-50 text-red-700"
+                    }`}
+                >
+                  {product.isAvailable ? "In Stock" : "Out of Stock"}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
+    </div>
+  );
 }

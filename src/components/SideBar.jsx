@@ -165,7 +165,7 @@ export function Sidebar({
 
           {!collapsed && (
             <button
-              onClick={() => router.push("/admin/login")}
+              onClick={() => router.push("/login")}
               className="mt-1 flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-ink-500 transition-colors hover:bg-danger-50 hover:text-danger-600"
             >
               <LogOut className="h-4.5 w-4.5" strokeWidth={2} />

@@ -51,7 +51,7 @@ export function AreaChart({
     }));
 
     return (
-        <div className="area-chart-wrap" style={{ height }}>
+        <div className="w-full" style={{ height }}>
             <ResponsiveContainer width="100%" height="100%">
                 <RechartsAreaChart
                     data={chartData}
@@ -117,20 +117,20 @@ export function AreaChart({
                             );
 
                             return (
-                                <div className="chart-tooltip">
-                                    <div className="tt-label">
+                                <div className="rounded-lg bg-ink-900 px-3 py-2 text-white shadow-lg">
+                                    <div className="text-xs text-white/70">
                                         {label}
                                     </div>
 
                                     <div
-                                        className="tt-value"
+                                        className="text-sm font-bold"
                                         style={{ color }}
                                     >
                                         {yFormat(current?.value ?? 0)}
                                     </div>
 
                                     {previous && (
-                                        <div className="tt-compare">
+                                        <div className="mt-0.5 text-xs text-white/60">
                                             Prev: {yFormat(previous.value)}
                                         </div>
                                     )}
@@ -184,7 +184,7 @@ export function Sparkline({
 
     return (
         <div
-            className="sparkline"
+            className="shrink-0"
             style={{ width, height }}
         >
             <ResponsiveContainer width="100%" height="100%">
@@ -216,8 +216,8 @@ export function Donut({
     }));
 
     return (
-        <div className="donut-visual">
-            <div className="donut-chart">
+        <div className="flex items-center gap-5">
+            <div className="relative h-32 w-32 shrink-0">
                 <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
                         <Pie
@@ -239,25 +239,24 @@ export function Donut({
                     </PieChart>
                 </ResponsiveContainer>
 
-                <div className="donut-hole">
-                    <strong>{centerValue}</strong>
-                    <small>{centerLabel}</small>
+                <div className="absolute inset-0 grid place-items-center text-center">
+                    <div><strong className="block text-lg text-ink-900">{centerValue}</strong><small className="text-xs text-ink-500">{centerLabel}</small></div>
                 </div>
             </div>
 
-            <div className="donut-legend">
+            <div className="flex flex-1 flex-col gap-2">
                 {slices.map((slice) => (
-                    <div key={slice.label}>
-                        <span>
+                    <div key={slice.label} className="flex items-center justify-between text-sm">
+                        <span className="flex items-center gap-2 text-ink-600">
                             <i
                                 style={{
                                     background: colorVar(slice.color),
                                 }}
-                            />
+                                className="h-2 w-2 rounded-full" />
                             {slice.label}
                         </span>
 
-                        <b>
+                        <b className="text-ink-900">
                             {slice.count ?? slice.value}
                         </b>
                     </div>
@@ -271,25 +270,24 @@ export function Donut({
 
 export function BarList({ items }) {
     return (
-        <div className="bar-list">
+        <div className="space-y-4">
             {items.map((item) => (
                 <div
-                    className="bar-list-item"
+                    className="space-y-2"
                     key={item.name}
                 >
-                    <div className="bar-list-head">
+                    <div className="flex items-center justify-between text-sm text-ink-600">
                         <span>{item.name}</span>
 
-                        <div>
-                            <b>{item.value}</b>
+                        <div className="flex items-center gap-2"><b className="text-ink-900">{item.value}</b>
 
                             {item.sub && (
-                                <small>{item.sub}</small>
+                                <small className="text-xs text-ink-400">{item.sub}</small>
                             )}
                         </div>
                     </div>
 
-                    <div className="bar-list-track">
+                    <div className="h-1.5 overflow-hidden rounded bg-ink-100">
                         <i
                             style={{
                                 width: `${item.pct}%`,
@@ -320,20 +318,20 @@ export function Heatmap({
     ];
 
     return (
-        <div className="heatmap-wrap">
-            <div className="heatmap-days">
+        <div className="overflow-x-auto"><div className="min-w-[520px]">
+            <div className="grid grid-cols-7 gap-1 text-center text-xs text-ink-500">
                 {days.map((day) => (
                     <span key={day}>{day}</span>
                 ))}
             </div>
 
-            <div className="heatmap-body">
-                <div className="heatmap-cells">
+            <div className="mt-2">
+                <div className="grid grid-cols-7 gap-1">
                     {data.map((row, dayIndex) =>
                         row.map((level, hourIndex) => (
                             <div
                                 key={`${dayIndex}-${hourIndex}`}
-                                className="heatmap-cell"
+                                className="aspect-square min-h-5 rounded-sm"
                                 style={{
                                     background: levels[level],
                                 }}
@@ -343,30 +341,18 @@ export function Heatmap({
                     )}
                 </div>
 
-                <div className="heatmap-hours">
-                    {hours.map((hour, index) => (
-                        <span
-                            key={hour}
-                            className={index % 2 === 0 ? 'show' : ''}
-                        >
-                            {hour}
-                        </span>
-                    ))}
-                </div>
             </div>
-
-            <div className="heatmap-legend">
+            <div className="mt-3 flex items-center justify-end gap-1 text-xs text-ink-500">
                 <span>Less</span>
 
                 {levels.map((color, index) => (
-                    <i
+                    <i className="h-3 w-3 rounded-sm"
                         key={index}
                         style={{ background: color }}
                     />
                 ))}
 
                 <span>More</span>
-            </div>
-        </div>
+            </div></div></div>
     );
 }

@@ -1,28 +1,33 @@
-import { Plus, Clock3 } from 'lucide-react';
+﻿"use client";
+
+import { useRouter } from "next/navigation";
+import { Plus, Clock3 } from "lucide-react";
 
 export default function Header() {
-    return (
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between pb-6">
-            <div>
-                <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-                <p className="mt-1 text-sm text-gray-500">
-                    Good morning, Alex. Here&apos;s what needs your attention today.
-                </p>
-            </div>
-            <div className="flex items-center gap-3">
-                <button
-                    type="button"
-                    className="h-9 flex items-center gap-1.75 px-3.5 rounded-lg font-semibold text-[12px] text-gray-700 bg-white border border-gray-200 hover:border-[#d4d9dd] hover:bg-[#fcfcfd] transition-all duration-150 outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2">
-                    <Clock3 size={14} className="text-gray-500" />
-                    Today
-                </button>
-                <button
-                    type="button"
-                    className="h-9 flex items-center gap-1.75 px-3.5 rounded-lg font-semibold text-[12px] text-white bg-brand-500 shadow-[0_3px_10px_rgba(255,90,31,0.22)] hover:bg-[#eb4e17] transition-all duration-150 outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2">
-                    <Plus size={15} />
-                    New Product
-                </button>
-            </div>
+  const router = useRouter();
+
+  return (
+    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between pb-6">
+      <div>
+        <h1 className="text-2xl font-bold text-ink-900">Dashboard</h1>
+        <p className="mt-1 text-sm text-ink-500">
+          Welcome back. Here is your live store & kitchen performance overview.
+        </p>
+      </div>
+      <div className="flex items-center gap-3">
+        <div className="h-9 flex items-center gap-1.5 px-3.5 rounded-lg font-semibold text-xs text-ink-700 bg-white border border-ink-200">
+          <Clock3 size={14} className="text-ink-500" />
+          Live Data
         </div>
-    );
+        <button
+          type="button"
+          onClick={() => router.push("/menu/new")}
+          className="h-9 flex items-center gap-1.5 px-3.5 rounded-lg font-semibold text-xs text-white bg-orange-500 hover:bg-orange-600 transition cursor-pointer"
+        >
+          <Plus size={15} />
+          New Product
+        </button>
+      </div>
+    </div>
+  );
 }

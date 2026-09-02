@@ -1,188 +1,109 @@
-import { Utensils } from 'lucide-react';
+﻿"use client";
 
-const bestSellers = [
-    {
-        name: 'Classic Burger',
-        thumb: 'orange',
-        units: 248,
-        share: '18%',
-        revenue: '$3,720',
-    },
-    {
-        name: 'Chicken Pizza',
-        thumb: 'red',
-        units: 196,
-        share: '14%',
-        revenue: '$2,940',
-    },
-    {
-        name: 'French Fries',
-        thumb: 'amber',
-        units: 174,
-        share: '11%',
-        revenue: '$2,610',
-    },
-    {
-        name: 'Chicken Wrap',
-        thumb: 'green',
-        units: 142,
-        share: '9%',
-        revenue: '$2,130',
-    },
-    {
-        name: 'Coca Cola',
-        thumb: 'blue',
-        units: 118,
-        share: '7%',
-        revenue: '$1,770',
-    },
-];
-
-const recentActivity = [
-    {
-        tone: 'success',
-        title: 'Order #1052 completed',
-        desc: 'Customer order was successfully delivered.',
-        time: '2 min ago',
-    },
-    {
-        tone: 'info',
-        title: 'New order received',
-        desc: 'Order #1053 has been added to the kitchen queue.',
-        time: '8 min ago',
-    },
-    {
-        tone: 'warning',
-        title: 'Low stock alert',
-        desc: 'Mozzarella is running low and needs attention.',
-        time: '15 min ago',
-    },
-    {
-        tone: 'danger',
-        title: 'Delivery delayed',
-        desc: 'Order #1044 is running behind schedule.',
-        time: '24 min ago',
-    },
-];
-
-const thumbColors = {
-    orange: '#bf6b38',
-    blue: '#3981f7',
-    green: '#19b985',
-    amber: '#f0a826',
-    red: '#ef5d54',
-};
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { Utensils, CheckCircle, Clock, AlertCircle } from "lucide-react";
+import { getProducts, getOrders } from "@/data/mockDataStore";
 
 export default function Performance() {
-    return (
-        <div className="grid-split">
+  const [products, setProducts] = useState([]);
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-            {/* Best Selling Products */}
-            <section className="card card-padded">
+  useEffect(() => {
+    Promise.all([getProducts().catch(() => []), getOrders().catch(() => [])])
+      .then(([prodsRes, ordersRes]) => {
+        setProducts(Array.isArray(prodsRes) ? prodsRes : []);
+        setOrders(Array.isArray(ordersRes) ? ordersRes : []);
+      })
+      .finally(() => setLoading(false));
+  }, []);
 
-                <div className="card-header">
-                    <div>
-                        <h3>Best Selling Products</h3>
-                        <p>Top performers this week</p>
-                    </div>
+  const bestSellers = products.slice(0, 5);
 
-                    <button className="text-link">
-                        View all →
-                    </button>
-                </div>
-
-                <div className="product-list">
-
-                    {bestSellers.map((product, index) => (
-                        <div
-                            className="product-row"
-                            key={product.name}
-                        >
-
-                            <span className="rank">
-                                {index + 1}
-                            </span>
-
-                            <span
-                                className="product-thumb"
-                                style={{
-                                    width: 32,
-                                    height: 32,
-                                    background:
-                                        thumbColors[product.thumb] ??
-                                        '#bf6b38',
-                                }}
-                            >
-                                <Utensils size={14} />
-                            </span>
-
-                            <div className="product-info">
-
-                                <strong>{product.name}</strong>
-
-                                <div className="product-bar">
-                                    <i
-                                        style={{
-                                            width: `${100 - index * 15}%`,
-                                        }}
-                                    />
-                                </div>
-
-                                <small>
-                                    {product.units} sold · {product.share} of revenue
-                                </small>
-
-                            </div>
-
-                            <b>{product.revenue}</b>
-
-                        </div>
-                    ))}
-
-                </div>
-
-            </section>
-
-
-            {/* Recent Activity */}
-            <section className="card card-padded">
-
-                <div className="card-header">
-                    <div>
-                        <h3>Recent Activity</h3>
-                        <p>Latest system events</p>
-                    </div>
-                </div>
-
-                <div className="activity-list">
-
-                    {recentActivity.map((activity) => (
-                        <div
-                            className="activity-row"
-                            key={activity.title}
-                        >
-
-                            <span
-                                className={`activity-icon ${activity.tone}`}
-                            >
-                                <span className="activity-dot" />
-                            </span>
-
-                            <div>
-                                <strong>{activity.title}</strong>
-
-                                <p>{activity.desc}</p>
-
-                                <small>{activity.time}</small>
-                            </div>
-
-                        </div>
-                    ))}
-
-                </div>
-
-            </section>
-
+  return (
+    <div className="grid grid-cols-1 gap-4 xl:grid-cols-2 mb-5">
+      {/* Best Selling Products */}
+      <section className="rounded-xl border border-ink-200 bg-white p-5 shadow-xs">
+        <div className="mb-4 flex items-center justify-between border-b border-ink-100 pb-3">
+          <div>
+            <h3 className="font-semibold text-ink-900">Featured Products</h3>
+            <p className="text-xs text-ink-400">Top catalog items from database</p>
+          </div>
+          <Link href="/menu" className="text-xs font-semibold text-orange-600 hover:text-orange-700">
+            View menu →
+          </Link>
         </div>
-    );
+
+        {loading ? (
+          <div className="py-6 text-center text-xs text-ink-400">Loading featured items...</div>
+        ) : (
+          <div className="space-y-3">
+            {bestSellers.map((product, idx) => (
+              <div key={product.id} className="flex items-center gap-3 border-b border-ink-100 pb-3 last:border-0 last:pb-0">
+                <span className="text-xs font-bold text-ink-400 w-5">#{idx + 1}</span>
+                <span className="grid h-8 w-8 place-items-center rounded-lg bg-orange-50 text-orange-600">
+                  <Utensils size={14} />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <strong className="block text-xs font-semibold text-ink-900">{product.name}</strong>
+                  <p className="text-[11px] text-ink-400">{product.category?.name || "Product"}</p>
+                </div>
+                <b className="text-sm font-semibold text-ink-900">${Number(product.basePrice || product.price || 0).toFixed(2)}</b>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
+
+      {/* Recent Activity */}
+      <section className="rounded-xl border border-ink-200 bg-white p-5 shadow-xs">
+        <div className="mb-4 flex items-center justify-between border-b border-ink-100 pb-3">
+          <div>
+            <h3 className="font-semibold text-ink-900">Recent Order Activity</h3>
+            <p className="text-xs text-ink-400">Live order status stream</p>
+          </div>
+        </div>
+
+        {loading ? (
+          <div className="py-6 text-center text-xs text-ink-400">Loading activity...</div>
+        ) : !orders.length ? (
+          <div className="py-6 text-center text-xs text-ink-400">No recent activity</div>
+        ) : (
+          <div className="space-y-3">
+            {orders.slice(0, 4).map((order) => {
+              let Icon = Clock;
+              let toneClass = "bg-blue-50 text-blue-600";
+              if (order.status === "COMPLETED") {
+                Icon = CheckCircle;
+                toneClass = "bg-green-50 text-green-600";
+              } else if (order.status === "CANCELLED") {
+                Icon = AlertCircle;
+                toneClass = "bg-red-50 text-red-600";
+              }
+
+              return (
+                <div key={order.id} className="flex items-start gap-3 border-b border-ink-100 pb-3 last:border-0 last:pb-0">
+                  <span className={`mt-0.5 grid h-7 w-7 place-items-center rounded-lg ${toneClass}`}>
+                    <Icon size={14} />
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <strong className="block text-xs font-semibold text-ink-900">
+                      Order {order.orderNumber} - {order.status}
+                    </strong>
+                    <p className="text-[11px] text-ink-400">
+                      {order.customerName} • Total ${Number(order.totalAmount || 0).toFixed(2)}
+                    </p>
+                  </div>
+                  <small className="text-[11px] text-ink-400">
+                    {order.createdAt ? new Date(order.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : "Just now"}
+                  </small>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </section>
+    </div>
+  );
 }

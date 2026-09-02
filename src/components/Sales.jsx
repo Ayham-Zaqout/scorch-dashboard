@@ -1,223 +1,130 @@
-'use client';
+﻿"use client";
 
-import { useState } from 'react';
-import { Bike, Clock3, TrendingUp, Utensils } from 'lucide-react';
-
-import { AreaChart } from '@/components/AreaChart';
-
-const METRICS = {
-    revenue: {
-        color: '#ff5a1f',
-        formatValue: (value) => `$${Math.round(value / 1000)}k`,
-        total: '$24,468',
-    },
-    orders: {
-        color: '#3981f7',
-        formatValue: (value) => value,
-        total: '700',
-    },
-    aov: {
-        color: '#19b985',
-        formatValue: (value) => `$${value}`,
-        total: '$34.95',
-    },
-};
-
-const METRIC_OPTIONS = [
-    { label: 'Revenue', value: 'revenue' },
-    { label: 'Orders', value: 'orders' },
-    { label: 'AOV', value: 'aov' },
-];
-
-const PERIOD_OPTIONS = [
-    { label: 'Today', value: 'today' },
-    { label: 'Week', value: 'week' },
-    { label: 'Month', value: 'month' },
-];
-
-const CHART_DATA = [1200, 1800, 1500, 2400, 2100, 2800, 3200];
-const CHART_LABELS = ['9 AM', '10 AM', '11 AM', '12 PM', '1 PM', '2 PM', '3 PM'];
-const PERIOD_LABELS = { today: 'Today', week: 'This week', month: 'This month' };
+import { useEffect, useState } from "react";
+import { TrendingUp, Utensils, Bike, Clock, Package } from "lucide-react";
+import RevenueAreaChart from "@/components/charts/RevenueAreaChart";
+import { getAnalyticsOverview } from "@/data/mockDataStore";
+import { emptyRevenueTrend } from "@/data/analytics";
 
 export default function SalesDashboard() {
-    const [metric, setMetric] = useState('revenue');
-    const [period, setPeriod] = useState('today');
-    const selectedMetric = METRICS[metric];
+  const [analytics, setAnalytics] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-    return (
-        <main>
+  useEffect(() => {
+    getAnalyticsOverview()
+      .then((res) => setAnalytics(res))
+      .catch(() => { })
+      .finally(() => setLoading(false));
+  }, []);
 
-            {/* Page Header */}
-            <div className="page-header">
-                <div>
-                    <h1>Dashboard</h1>
-                    <p>Today&apos;s performance overview</p>
-                </div>
+  const kpis = analytics?.kpis || {};
+  const trend = analytics?.revenueTrend || [];
 
+  const chartData = trend.length
+    ? trend.map((t) => ({
+      label: t.label || t.date,
+      revenue: t.revenue || 0,
+      orders: t.orders || 0,
+    }))
+    : emptyRevenueTrend;
+
+  return (
+    <div className="mb-5 grid grid-cols-1 gap-4 xl:grid-cols-[1.55fr_1fr]">
+      {/* Sales Overview */}
+      <section className="rounded-xl border border-ink-200 bg-white p-5 shadow-xs">
+        <div className="mb-4 flex flex-wrap items-start justify-between gap-3 border-b border-ink-100 pb-3">
+          <div>
+            <h3 className="text-[15px] font-semibold text-ink-900">Sales Overview</h3>
+            <p className="mt-0.5 text-xs text-ink-400">Real-time performance from database</p>
+          </div>
+          <span className="inline-flex items-center gap-1 rounded-md bg-green-50 px-2.5 py-1 text-xs font-semibold text-green-700 border border-green-200">
+            <TrendingUp size={13} />
+            Mock Data
+          </span>
+        </div>
+
+        <div className="mb-4 flex items-end justify-between">
+          <div>
+            <small className="text-xs text-ink-400">Total Revenue</small>
+            <strong className="mt-1 block text-3xl font-bold tracking-tight text-ink-900">
+              ${kpis.totalRevenue || "0.00"}
+            </strong>
+          </div>
+          <span className="text-xs text-ink-400">
+            Avg Order: <b className="text-ink-900">${kpis.averageOrderValue || "0.00"}</b>
+          </span>
+        </div>
+
+        {loading ? (
+          <div className="h-[220px] flex items-center justify-center text-xs text-ink-400">Loading chart...</div>
+        ) : (
+          <div className="h-[220px] w-full">
+            <RevenueAreaChart data={chartData} />
+          </div>
+        )}
+      </section>
+
+      {/* Database Overview Snapshot */}
+      <section className="rounded-xl border border-ink-200 bg-white p-5 shadow-xs">
+        <div className="mb-4 border-b border-ink-100 pb-3">
+          <h3 className="text-[15px] font-semibold text-ink-900">At a Glance</h3>
+          <p className="mt-0.5 text-xs text-ink-400">Database quick summary</p>
+        </div>
+
+        <div className="space-y-4">
+          <div className="flex items-center justify-between p-3 rounded-lg bg-gray-50 border border-gray-100">
+            <div className="flex items-center gap-3">
+              <span className="grid h-8 w-8 place-items-center rounded-lg bg-orange-100 text-orange-600">
+                <Utensils size={16} />
+              </span>
+              <div>
+                <strong className="block text-sm font-bold text-ink-900">{kpis.totalOrders || 0}</strong>
+                <small className="text-xs text-ink-400">Total orders in DB</small>
+              </div>
             </div>
+            <span className="text-xs font-medium text-orange-600">Orders</span>
+          </div>
 
-            {/* Sales */}
-            <div className="sales-split">
-
-                {/* Sales Overview */}
-                <section className="card card-padded sales-card">
-
-                    <div className="card-header">
-                        <div>
-                            <h3>Sales Overview</h3>
-                            <p>Today&apos;s performance in real time</p>
-                        </div>
-
-                        <div className="chart-controls">
-
-                            <div className="seg-toggle">
-                                {METRIC_OPTIONS.map((option) => (
-                                    <button
-                                        key={option.value}
-                                        className={
-                                            metric === option.value
-                                                ? 'selected'
-                                                : ''
-                                        }
-                                        onClick={() =>
-                                            setMetric(option.value)
-                                        }
-                                    >
-                                        {option.label}
-                                    </button>
-                                ))}
-                            </div>
-
-                            <div className="seg-toggle">
-                                {PERIOD_OPTIONS.map((option) => (
-                                    <button
-                                        key={option.value}
-                                        className={
-                                            period === option.value
-                                                ? 'selected'
-                                                : ''
-                                        }
-                                        onClick={() =>
-                                            setPeriod(option.value)
-                                        }
-                                    >
-                                        {option.label}
-                                    </button>
-                                ))}
-                            </div>
-
-                        </div>
-                    </div>
-
-                    <div className="sales-summary">
-                        <div>
-                            <small>
-                                {PERIOD_LABELS[period]} total
-                            </small>
-
-                            <strong
-                                style={{
-                                    color: selectedMetric.color,
-                                }}
-                            >
-                                {selectedMetric.total}
-                            </strong>
-                        </div>
-
-                        <span className="trend-badge">
-                            <TrendingUp size={12} />
-                            +14.2%
-                        </span>
-                    </div>
-
-                    <AreaChart
-                        data={CHART_DATA}
-                        color={selectedMetric.color}
-                        xLabels={CHART_LABELS}
-                        yFormat={selectedMetric.formatValue}
-                        height={220}
-                    />
-
-                </section>
-
-                {/* Today at a Glance */}
-                <section className="card card-padded sales-side">
-
-                    <div className="card-header">
-                        <div>
-                            <h3>Today at a Glance</h3>
-                            <p>Quick snapshot</p>
-                        </div>
-                    </div>
-
-                    <div className="glance-list">
-
-                        <div className="glance-row">
-                            <span className="glance-icon orange">
-                                <Utensils size={14} />
-                            </span>
-
-                            <div>
-                                <strong>142</strong>
-                                <small>orders today</small>
-                            </div>
-
-                            <span className="trend-badge">
-                                <TrendingUp size={12} />
-                                +12%
-                            </span>
-                        </div>
-
-                        <div className="glance-row">
-                            <span className="glance-icon blue">
-                                <Bike size={14} />
-                            </span>
-
-                            <div>
-                                <strong>38</strong>
-                                <small>deliveries out</small>
-                            </div>
-
-                            <span className="trend-badge">
-                                <TrendingUp size={12} />
-                                +5%
-                            </span>
-                        </div>
-
-                        <div className="glance-row">
-                            <span className="glance-icon green">
-                                <Clock3 size={14} />
-                            </span>
-
-                            <div>
-                                <strong>6m 20s</strong>
-                                <small>avg prep time</small>
-                            </div>
-
-                            <span className="pill pill-success">
-                                ● On target
-                            </span>
-                        </div>
-
-                        <div className="glance-row">
-                            <span className="glance-icon red">
-                                <Utensils size={14} />
-                            </span>
-
-                            <div>
-                                <strong>4</strong>
-                                <small>low stock items</small>
-                            </div>
-
-                            <span className="pill pill-danger">
-                                ● Urgent
-                            </span>
-                        </div>
-
-                    </div>
-                </section>
-
+          <div className="flex items-center justify-between p-3 rounded-lg bg-gray-50 border border-gray-100">
+            <div className="flex items-center gap-3">
+              <span className="grid h-8 w-8 place-items-center rounded-lg bg-blue-100 text-blue-600">
+                <Bike size={16} />
+              </span>
+              <div>
+                <strong className="block text-sm font-bold text-ink-900">{kpis.pendingOrders || 0}</strong>
+                <small className="text-xs text-ink-400">Pending & active orders</small>
+              </div>
             </div>
-        </main>
-    );
+            <span className="text-xs font-medium text-blue-600">Active</span>
+          </div>
+
+          <div className="flex items-center justify-between p-3 rounded-lg bg-gray-50 border border-gray-100">
+            <div className="flex items-center gap-3">
+              <span className="grid h-8 w-8 place-items-center rounded-lg bg-green-100 text-green-600">
+                <Package size={16} />
+              </span>
+              <div>
+                <strong className="block text-sm font-bold text-ink-900">{kpis.activeProducts || 0}</strong>
+                <small className="text-xs text-ink-400">Active menu products</small>
+              </div>
+            </div>
+            <span className="text-xs font-medium text-green-600">Available</span>
+          </div>
+
+          <div className="flex items-center justify-between p-3 rounded-lg bg-gray-50 border border-gray-100">
+            <div className="flex items-center gap-3">
+              <span className="grid h-8 w-8 place-items-center rounded-lg bg-purple-100 text-purple-600">
+                <Clock size={16} />
+              </span>
+              <div>
+                <strong className="block text-sm font-bold text-ink-900">{kpis.totalLocations || 0}</strong>
+                <small className="text-xs text-ink-400">Operating restaurant locations</small>
+              </div>
+            </div>
+            <span className="text-xs font-medium text-purple-600">Locations</span>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
 }
